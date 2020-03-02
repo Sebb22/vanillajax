@@ -4,6 +4,7 @@ var app = {
 
   ulElement: document.createElement("ul"),
 
+
   init: function () {
     app.buttonElement.addEventListener("click", app.handleAjaxCall);
 
@@ -17,7 +18,7 @@ var app = {
     }
 
     console.log('click!');
-    app.ajaxGet("https://eonet.sci.gsfc.nasa.gov/api/v2.1/events?limit=4", app.callback);
+    app.ajaxGet("https://eonet.sci.gsfc.nasa.gov/api/v2.1/events?limit=3", app.callback);
     document.querySelector("#test").appendChild(app.ulElement);
   },
 
@@ -57,11 +58,13 @@ var app = {
     if (eventItem != "") {
 
       var itemElement = document.createElement("li");
+      itemElement.setAttribute("class","eventItem");
       eventItemCoordinates = eventItem.geometries[0].coordinates;
       itemElement.innerHTML = eventItem.title;
       itemElement.dataset.coordinates = eventItemCoordinates;
 
       app.ulElement.appendChild(itemElement);
+      app.ulElement.setAttribute("class","ulElement");
       itemElement.addEventListener("click", app.handleDisplayMap);
     }
   },
@@ -71,6 +74,16 @@ var app = {
 
     var itemElement = event.currentTarget;
     console.log(itemElement.getAttribute("data-coordinates"));
+
+    var map;
+    function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: -34.397, lng: 150.644},
+        zoom: 8
+      });
+    }
+  
+    console.log(map);
   }
 
 }

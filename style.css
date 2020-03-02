@@ -2,3 +2,14 @@
     color:#ccff00;
     background:#303030;
 }
+
+/* .ulElement{
+    display:flex;
+    flex-wrap:wrap;
+} */
+
+.eventItem{
+    /* display:block; */
+    padding:1em;
+    margin-bottom:0.3em;
+}
