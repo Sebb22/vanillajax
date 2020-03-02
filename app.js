@@ -45,10 +45,10 @@ var app = {
     // console.log(response);
 
     //loop displaying every item
-    for (var i = 0; i <= response.length; i++) {
+    for (var i = 0; i < response.length; i++) {
       var eventItem = response[i];
       // console.log(eventItem.title);
-      // console.log(eventItem.geometries);
+      // console.log(eventItem.geometries[i]);
       app.displayResponseItems(eventItem);
     }
   },
@@ -57,8 +57,9 @@ var app = {
     if (eventItem != "") {
 
       var itemElement = document.createElement("li");
+      eventItemCoordinates = eventItem.geometries[0].coordinates;
       itemElement.innerHTML = eventItem.title;
-      //itemElement.dataset=eventItem;
+      itemElement.dataset.coordinates = eventItemCoordinates;
 
       app.ulElement.appendChild(itemElement);
       itemElement.addEventListener("click", app.handleDisplayMap);
@@ -66,10 +67,10 @@ var app = {
   },
 
   handleDisplayMap: function () {
-    console.log("pop");
-    var itemElement = event.currentTarget;
-    //console.log(itemElement.data);
+    // itemElement.getAttribute("data-coordinates");
 
+    var itemElement = event.currentTarget;
+    console.log(itemElement.getAttribute("data-coordinates"));
   }
 
 }
