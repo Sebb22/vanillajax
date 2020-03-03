@@ -3,6 +3,11 @@
     background:#303030;
 }
 
+#map{
+    width:100%;
+    height:50vh;
+}
+
 /* .ulElement{
     display:flex;
     flex-wrap:wrap;

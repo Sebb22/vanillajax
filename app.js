@@ -58,13 +58,15 @@ var app = {
     if (eventItem != "") {
 
       var itemElement = document.createElement("li");
-      itemElement.setAttribute("class","eventItem");
+      itemElement.setAttribute("class", "eventItem");
       eventItemCoordinates = eventItem.geometries[0].coordinates;
+      // console.log(eventItemCoordinates);
       itemElement.innerHTML = eventItem.title;
-      itemElement.dataset.coordinates = eventItemCoordinates;
+      itemElement.dataset.coordinateX = eventItemCoordinates[0];
+      itemElement.dataset.coordinateY = eventItemCoordinates[1];
 
       app.ulElement.appendChild(itemElement);
-      app.ulElement.setAttribute("class","ulElement");
+      app.ulElement.setAttribute("class", "ulElement");
       itemElement.addEventListener("click", app.handleDisplayMap);
     }
   },
@@ -73,16 +75,14 @@ var app = {
     // itemElement.getAttribute("data-coordinates");
 
     var itemElement = event.currentTarget;
-    console.log(itemElement.getAttribute("data-coordinates"));
+    var itemElementCoordinateX = itemElement.getAttribute("data-coordinate-x");
+    var itemElementCoordinateY = itemElement.getAttribute("data-coordinate-y");
+    // initialize the map on the "map" div with a given center and zoom
+    var map = L.map('map', {
+      center: [itemElementCoordinateX, itemElementCoordinateY],
+      zoom: 13
+    });
 
-    var map;
-    function initMap() {
-      map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: -34.397, lng: 150.644},
-        zoom: 8
-      });
-    }
-  
     console.log(map);
   }
 
