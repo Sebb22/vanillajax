@@ -76,6 +76,10 @@ var app = {
   },
 
   handleDisplayMap: function () {
+    var container = L.DomUtil.get('map');
+      if(container != null){
+        container._leaflet_id = null;
+      }
     var itemElement = event.currentTarget;
     var itemElementCoordinateX = itemElement.getAttribute("data-coordinate-x");
     var itemElementCoordinateY = itemElement.getAttribute("data-coordinate-y");
