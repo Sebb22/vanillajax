@@ -4,6 +4,7 @@ var app = {
 
   ulElement: document.createElement("ul"),
 
+  map: document.querySelector("#map"),
 
   init: function () {
     app.buttonElement.addEventListener("click", app.handleAjaxCall);
@@ -18,8 +19,11 @@ var app = {
     }
 
     console.log('click!');
-    app.ajaxGet("https://eonet.sci.gsfc.nasa.gov/api/v2.1/events?limit=3", app.callback);
+    app.ajaxGet("https://eonet.sci.gsfc.nasa.gov/api/v2.1/events?limit=10", app.callback);
     document.querySelector("#test").appendChild(app.ulElement);
+
+    // app.handleDisplayMap();
+    // console.log(app.ulElement);
   },
 
   ajaxGet: function (url, callback) {
@@ -48,15 +52,13 @@ var app = {
     //loop displaying every item
     for (var i = 0; i < response.length; i++) {
       var eventItem = response[i];
-      // console.log(eventItem.title);
-      // console.log(eventItem.geometries[i]);
       app.displayResponseItems(eventItem);
     }
   },
 
   displayResponseItems: function (eventItem) {
     if (eventItem != "") {
-
+      //console.log(eventItem);
       var itemElement = document.createElement("li");
       itemElement.setAttribute("class", "eventItem");
       eventItemCoordinates = eventItem.geometries[0].coordinates;
@@ -68,38 +70,38 @@ var app = {
       app.ulElement.appendChild(itemElement);
       app.ulElement.setAttribute("class", "ulElement");
       itemElement.addEventListener("click", app.handleDisplayMap);
+
     }
+
   },
 
   handleDisplayMap: function () {
-    // itemElement.getAttribute("data-coordinates");
-
     var itemElement = event.currentTarget;
     var itemElementCoordinateX = itemElement.getAttribute("data-coordinate-x");
     var itemElementCoordinateY = itemElement.getAttribute("data-coordinate-y");
-    // initialize the map on the "map" div with a given center and zoom
-    var map = L.map('map', {
-      center: [itemElementCoordinateX, itemElementCoordinateY],
+
+    //initialize the map on the "map" div with a given center and zoom
+    app.map = L.map('map', {
+      center: [itemElementCoordinateY, itemElementCoordinateX],
       zoom: 13
     });
 
-    console.log(map);
+    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+      maxZoom: 18,
+      id: 'mapbox/satellite-v9',
+      tileSize: 512,
+      zoomOffset: -1,
+      accessToken: 'pk.eyJ1Ijoic2ViYjIyIiwiYSI6ImNrN2JtaTVvajA0NHgzZXJ5bHY3dnBxMjIifQ.NF7QR5HHWJSFctdhrSr7iQ'
+    }).addTo(app.map);
+
+    L.marker([itemElementCoordinateY, itemElementCoordinateX]).addTo(app.map)
+      .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+      .openPopup();
+
   }
 
 }
 
 app.init();
 
-/*
-<script>
-     var map;
-     function initMap() {
-       map = new google.maps.Map(document.getElementById('map'), {
-         center: {lat: -34.397, lng: 150.644},
-         zoom: 8
-       });
-     }
-   </script>
-   <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"
-   async defer></script>
-*/
