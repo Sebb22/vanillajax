@@ -8,13 +8,20 @@
     height:50vh;
 }
 
-/* .ulElement{
+.ulElement{
     display:flex;
     flex-wrap:wrap;
-} */
+    justify-content:center;
+    list-style:none;
+}
 
 .eventItem{
-    /* display:block; */
     padding:1em;
     margin-bottom:0.3em;
+    width:calc(20%);
+    text-align:center;
+}
+
+.leaflet-popup-content{
+    width:50vw;
 }

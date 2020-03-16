@@ -6,11 +6,22 @@ var app = {
 
   map: document.querySelector("#map"),
 
+  eventUrl: "https://eonet.sci.gsfc.nasa.gov/api/v2.1/events?limit=10",
+
+  query: "",
+
+  infoUrl: "http://newsapi.org/v2/everything?q=volcano&apiKey=dcaebe9e1393479fb40ec06801e47ed5",
+
+  itemElement: "",
+
+  //infoDescription: "",
+
   init: function () {
     app.buttonElement.addEventListener("click", app.handleAjaxCall);
 
   },
 
+  //event handling event's ajax call
   handleAjaxCall: function () {
     event.preventDefault();
     if (app.ulElement.hasChildNodes()) {
@@ -19,20 +30,24 @@ var app = {
     }
 
     console.log('click!');
-    app.ajaxGet("https://eonet.sci.gsfc.nasa.gov/api/v2.1/events?limit=10", app.callback);
+    app.ajaxGet(app.eventUrl, app.eventCallback);
     document.querySelector("#test").appendChild(app.ulElement);
-
-    // app.handleDisplayMap();
-    // console.log(app.ulElement);
   },
 
+  //js vanilla ajax call
   ajaxGet: function (url, callback) {
     var req = new XMLHttpRequest();
     req.open("GET", url);
     req.addEventListener("load", function () {
       if (req.status >= 200 && req.status < 400) {
         // Appelle la fonction callback en lui passant la réponse de la requête
-        app.callback(req.responseText);
+        if (url === app.eventUrl) {
+          app.eventCallback(req.responseText);
+        }
+        else if (url === app.infoUrl) {
+          app.postCallback(req.responseText);
+        }
+
       } else {
         console.error(req.status + " " + req.statusText + " " + url);
       }
@@ -43,8 +58,11 @@ var app = {
     req.send(null);
   },
 
-  callback: function (response) {
+  //event's ajax callback function
+  eventCallback: function (response) {
+    //console.log(response);
     var response = JSON.parse(response);
+
     //about setting apart events
     response = response.events;
     // console.log(response);
@@ -56,6 +74,24 @@ var app = {
     }
   },
 
+  //post's ajax callback function
+  postCallback: function (response) {
+    app.infoDescription = "";
+    var response = JSON.parse(response);
+    var postInfos = response;
+    //console.log(postInfos.totalResults);
+    console.log(postInfos.articles[0]);
+    if (postInfos.totalResults > 0) {
+      var infoDescription = postInfos.articles[0].description;
+      var infoPicture = postInfos.articles[0].urlToImage;
+      var infoUrl = postInfos.articles[0].url;
+    }
+    app.handleDisplayMap(infoDescription, infoPicture, infoUrl);
+
+
+  },
+
+  //function displaying events into li
   displayResponseItems: function (eventItem) {
     if (eventItem != "") {
       //console.log(eventItem);
@@ -69,25 +105,34 @@ var app = {
 
       app.ulElement.appendChild(itemElement);
       app.ulElement.setAttribute("class", "ulElement");
-      itemElement.addEventListener("click", app.handleDisplayMap);
+
+      //event on click displaying map
+      itemElement.addEventListener("click", () => {
+        app.handlePopUpInfo();
+
+      });
 
     }
 
   },
 
-  handleDisplayMap: function () {
+  //event displaying a map relative to event clicked
+  handleDisplayMap: function (infoDescription, infoPicture, infoUrl) {
+
     var container = L.DomUtil.get('map');
-      if(container != null){
-        container._leaflet_id = null;
-      }
-    var itemElement = event.currentTarget;
-    var itemElementCoordinateX = itemElement.getAttribute("data-coordinate-x");
-    var itemElementCoordinateY = itemElement.getAttribute("data-coordinate-y");
+    if (container != null) {
+      container._leaflet_id = null;
+    }
+
+    var itemElementCoordinateX = app.itemElement.getAttribute("data-coordinate-x");
+    var itemElementCoordinateY = app.itemElement.getAttribute("data-coordinate-y");
+
+    //app.handlePopUpInfo(itemElement);
 
     //initialize the map on the "map" div with a given center and zoom
     app.map = L.map('map', {
       center: [itemElementCoordinateY, itemElementCoordinateX],
-      zoom: 13
+      zoom: 10,
     });
 
     L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
@@ -99,13 +144,40 @@ var app = {
       accessToken: 'pk.eyJ1Ijoic2ViYjIyIiwiYSI6ImNrN2JtaTVvajA0NHgzZXJ5bHY3dnBxMjIifQ.NF7QR5HHWJSFctdhrSr7iQ'
     }).addTo(app.map);
 
-    L.marker([itemElementCoordinateY, itemElementCoordinateX]).addTo(app.map)
-      .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
-      .openPopup();
+    //L.marker([itemElementCoordinateY, itemElementCoordinateX]).addTo(app.map)
+    if (infoDescription) {
+      if (infoPicture != null) {
+        var popup = L.popup()
+          .setLatLng([itemElementCoordinateY, itemElementCoordinateX])
+          .setContent("<img src=" + infoPicture + " style=display:block;width:95%>"
+            + "<p>" + infoDescription + "</p>"
+            + "<a href=" + infoUrl + " target=_blank>See article</a>")
+          .openOn(app.map);
+      } else {
+        popup = L.popup()
+          .setLatLng([itemElementCoordinateY, itemElementCoordinateX])
+          .setContent("<p>" + infoDescription + "</p>"
+            + "<a href=" + infoUrl + " target=_blank>See article</a>")
+          .openOn(app.map);
+      }
+    }
+  },
 
+  //function setting ajax query  
+  handlePopUpInfo: function () {
+    app.itemElement = event.currentTarget;
+    console.log(app.itemElement);
+
+    app.query = app.itemElement.innerHTML;
+
+    app.infoUrl = "http://newsapi.org/v2/everything?q=" + app.query + "&apiKey=dcaebe9e1393479fb40ec06801e47ed5";
+
+    app.ajaxGet(app.infoUrl, app.postCallback);
+    // app.handleDisplayMap(app.itemElement);
   }
 
 }
 
 app.init();
+
 
