@@ -185,3 +185,6 @@ console.log(app.itemElement.innerHTML.replace(/[\W_]+/g,"+"));
 }
 
 app.init();
+
+
+//http://newsapi.org/v2/top-headlines?country=fr&apiKey=dcaebe9e1393479fb40ec06801e47ed5//
