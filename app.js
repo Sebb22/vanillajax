@@ -10,7 +10,7 @@ var app = {
 
   query: "",
 
-  infoUrl: "http://newsapi.org/v2/everything?q=volcano&apiKey=dcaebe9e1393479fb40ec06801e47ed5",
+  infoUrl: "http://newsapi.org/v2/everything?sources=google-news?q=volcano&apiKey=dcaebe9e1393479fb40ec06801e47ed5",
 
   itemElement: "",
 
@@ -80,7 +80,7 @@ var app = {
     var response = JSON.parse(response);
     var postInfos = response;
     //console.log(postInfos.totalResults);
-    console.log(postInfos.articles[0]);
+    //console.log(postInfos.articles[0]);
     if (postInfos.totalResults > 0) {
       var infoDescription = postInfos.articles[0].description;
       var infoPicture = postInfos.articles[0].urlToImage;
@@ -88,8 +88,7 @@ var app = {
     }
     app.handleDisplayMap(infoDescription, infoPicture, infoUrl);
 
-
-  },
+},
 
   //function displaying events into li
   displayResponseItems: function (eventItem) {
@@ -109,7 +108,12 @@ var app = {
       //event on click displaying map
       itemElement.addEventListener("click", () => {
         app.handlePopUpInfo();
-
+        //window.scrollTo(0, 1000);
+        window.scrollTo({
+  top: 1000,
+  left: 0,
+  behavior: 'smooth'
+});
       });
 
     }
@@ -166,9 +170,11 @@ var app = {
   //function setting ajax query  
   handlePopUpInfo: function () {
     app.itemElement = event.currentTarget;
-    console.log(app.itemElement);
+    
 
-    app.query = app.itemElement.innerHTML;
+console.log(app.itemElement.innerHTML.replace(/[\W_]+/g,"+"));
+
+    app.query = app.itemElement.innerHTML.replace(/[\W_]+/g,"+");
 
     app.infoUrl = "http://newsapi.org/v2/everything?q=" + app.query + "&apiKey=dcaebe9e1393479fb40ec06801e47ed5";
 
@@ -179,5 +185,3 @@ var app = {
 }
 
 app.init();
-
-
